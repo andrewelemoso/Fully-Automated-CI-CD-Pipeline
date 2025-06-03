@@ -1,3 +1,26 @@
+# Resource Group
+resource "azurerm_resource_group" "rg" {
+  name     = var.resource_group_name
+  location = var.location
+}
+
+# Import blocks for existing resources
+import {
+  id = "/subscriptions/57f52bfd-cff3-4a5b-9e96-40c260013804/resourceGroups/homelab/providers/Microsoft.Network/virtualNetworks/isaac-vnet"
+  to = module.vnet.azurerm_virtual_network.isaac_vnet
+}
+
+import {
+  id = "/subscriptions/57f52bfd-cff3-4a5b-9e96-40c260013804/resourceGroups/homelab/providers/Microsoft.Network/virtualNetworks/isaac-vnet/subnets/default"
+  to = module.vnet.azurerm_subnet.default
+}
+
+import {
+  id = "/subscriptions/57f52bfd-cff3-4a5b-9e96-40c260013804/resourceGroups/homelab/providers/Microsoft.Network/virtualNetworks/isaac-vnet/subnets/subnet1"
+  to = module.vnet.azurerm_subnet.subnet1
+}
+
+# AKS Module
 module "aks" {
   source                     = "./modules/aks"
   resource_group_name        = "${var.resource_group_name}-aks"
@@ -9,6 +32,7 @@ module "aks" {
   tags                       = var.tags
 }
 
+# Storage Module
 module "storage" {
   source                         = "./modules/storage"
   resource_group_name            = "${var.resource_group_name}-storage"
@@ -24,6 +48,7 @@ module "storage" {
   tags                           = var.tags
 }
 
+# Entra ID Module
 module "entra_id" {
   source                  = "./modules/entra-id"
   resource_group_name     = "${var.resource_group_name}-entra-id"
@@ -38,6 +63,7 @@ module "entra_id" {
   tags                    = var.tags
 }
 
+# RBAC Module
 module "rbac" {
   source           = "./modules/rbac"
   scope            = var.scope
@@ -48,9 +74,12 @@ module "rbac" {
   mom_principal_id = module.entra_id.mom_object_id
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = var.resource_group_name
-  location = var.location
+# Virtual Network Module
+module "vnet" {
+  source              = "./modules/vnet"
+  resource_group_name = var.resource_group_name
+  location           = var.location
+  address_space      = var.address_space
+  subnet_prefixes    = var.subnet_prefixes
+  tags              = var.tags
 }
-
-#data "azurerm_client_config" "current" {}
