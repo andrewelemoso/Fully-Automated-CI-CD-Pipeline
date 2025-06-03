@@ -38,3 +38,21 @@ variable "container_access_type" {
   description = "The access type for the storage container (private, blob, or container)"
   type        = string
 }
+
+variable "state_account_tier" {
+  description = "The tier of the state storage account (Standard or Premium)"
+  type        = string
+  default     = "Standard"
+}
+
+variable "state_account_replication_type" {
+  description = "The replication type of the state storage account (LRS, GRS, etc.)"
+  type        = string
+  default     = "LRS"
+}
+
+variable "storage_account_state_prefix" {
+  description = "The prefix name of the state storage account"
+  type        = string
+  default     = "tfstate"
+}
