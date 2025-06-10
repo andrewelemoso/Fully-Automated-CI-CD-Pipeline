@@ -23,7 +23,7 @@ resource "azurerm_storage_account" "storage" {
 
 resource "azurerm_storage_container" "container" {
   name                  = var.container_name
-  storage_account_id    = azurerm_storage_account.storage.id
+  storage_account_name  = azurerm_storage_account.storage.name
   container_access_type = var.container_access_type
 }
 
@@ -50,7 +50,6 @@ resource "azurerm_storage_account" "state_storage" {
       days = 30
     }
   }
-
   tags = merge(var.tags, {
     homelab = "storage account"
   })
@@ -58,7 +57,7 @@ resource "azurerm_storage_account" "state_storage" {
 
 resource "azurerm_storage_container" "state_container" {
   name                  = var.container_name
-  storage_account_id    = azurerm_storage_account.state_storage.id
+  storage_account_name  = azurerm_storage_account.state_storage.name
   container_access_type = var.container_access_type
 }
 

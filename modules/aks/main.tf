@@ -20,8 +20,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   azure_active_directory_role_based_access_control {
-    azure_rbac_enabled      = true
+    azure_rbac_enabled     = true
     admin_group_object_ids = var.aad_admin_group_object_ids
+  }
+
+  network_profile {
+    network_plugin = "kubenet"
+    network_policy = "calico"
   }
 
   tags = merge(var.tags, { homelab = "aks" })

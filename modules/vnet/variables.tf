@@ -11,7 +11,6 @@ variable "location" {
 variable "virtual_network_name" {
   description = "Name of the virtual network"
   type        = string
-  default     = "isaac-vnet"
 }
 
 variable "address_space" {

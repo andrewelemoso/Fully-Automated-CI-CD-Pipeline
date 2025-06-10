@@ -16,7 +16,6 @@ variable "rbac_role_name" {
 variable "location" {
   description = "The Azure region where resources will be deployed"
   type        = string
-  default     = "East US"
 }
 
 variable "tags" {
@@ -38,11 +37,6 @@ variable "node_count" {
 variable "vm_size" {
   description = "The VM size for the AKS default node pool"
   type        = string
-}
-
-variable "aad_admin_group_object_ids" {
-  description = "List of Azure AD group object IDs for AKS admin access"
-  type        = list(string)
 }
 
 variable "account_tier" {
@@ -138,32 +132,40 @@ variable "cluster_location" {
 variable "state_account_tier" {
   description = "The tier of the state storage account (Standard or Premium)"
   type        = string
-  default     = "Standard"
 }
 
 variable "state_account_replication_type" {
   description = "The replication type of the state storage account (LRS, GRS, etc.)"
   type        = string
-  default     = "LRS"
 }
 
 variable "storage_account_state_prefix" {
   description = "The prefix name of the state storage account"
   type        = string
-  default     = "tfstate"
+}
+
+variable "virtual_network_name" {
+  description = "Name of the virtual network"
+  type        = string
 }
 
 variable "address_space" {
   description = "The address space for the virtual network"
   type        = list(string)
-  default     = ["10.0.0.0/16"]
 }
 
 variable "subnet_prefixes" {
   description = "The address prefixes for the subnets"
   type        = map(string)
-  default     = {
-    "default" = "10.0.1.0/24"
-    "subnet1" = "10.0.2.0/24"
-  }
+}
+
+variable "Azure_AD_group_members" {
+  description = "List of Azure AD group members' object IDs"
+  type        = list(string)
+
+}
+
+variable "Azure_AD_display_name" {
+  description = "The display name for the Azure AD resources"
+  type        = string
 }

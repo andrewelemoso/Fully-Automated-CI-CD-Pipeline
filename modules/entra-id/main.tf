@@ -28,3 +28,4 @@ resource "azuread_user" "mom" {
   password              = var.mom_password
   force_password_change = false
 }
+
