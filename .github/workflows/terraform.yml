@@ -75,16 +75,12 @@ jobs:
     # Download tfvars from Azure Storage
     - name: Download tfvars from Azure Storage
       run: |
-        az login --service-principal \
-          --username ${{ secrets.AZURE_CLIENT_ID }} \
-          --password ${{ secrets.AZURE_CLIENT_SECRET }} \
-          --tenant ${{ secrets.AZURE_TENANT_ID }}
         az storage blob download \
           --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
           --container-name ${{ secrets.AZURE_STORAGE_CONTAINER }} \
           --name ${{ secrets.AZURE_TFVARS_BLOB }} \
           --file variables.auto.tfvars \
-          --auth-mode login
+          --account-key ${{ secrets.AZURE_ACCESS_KEY }}
       working-directory: ./Terraform
 
     # Initialize Terraform with backend config
