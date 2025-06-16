@@ -112,7 +112,7 @@ module "vnet" {
 
 # Azure AD Module
 module "azure_ad" {
-  source                    = "./modules/Azure-AD"
-  display_name              = var.Azure_AD_display_name
-  group_members             = var.Azure_AD_group_members
+  source        = "./modules/Azure-AD"
+  display_name  = var.Azure_AD_display_name
+  group_members = var.Azure_AD_group_members
 }
