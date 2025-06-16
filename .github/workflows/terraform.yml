@@ -69,19 +69,24 @@ jobs:
         echo "storage_account_name = \"${{ secrets.AZURE_STORAGE }}\"" >> backend.tfvars
         echo "container_name = \"${{ secrets.AZURE_CONTAINER }}\"" >> backend.tfvars
         echo "key = \"${{ secrets.AZURE_KEY }}\"" >> backend.tfvars
+      working-directory: ./Terraform
 
     # Initialize Terraform with backend config
     - name: Terraform Init
       run: terraform init -backend-config=backend.tfvars
+      working-directory: ./Terraform
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: terraform fmt -check
+      working-directory: ./Terraform
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       run: terraform plan -input=false
+      working-directory: ./Terraform
 
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
       run: terraform apply -auto-approve -input=false
+      working-directory: ./Terraform
