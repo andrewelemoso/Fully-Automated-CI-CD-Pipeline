@@ -66,9 +66,10 @@ jobs:
     - name: Create backend config
       run: |
         echo "resource_group_name = \"${{ secrets.AZURE_RG }}\"" > backend.tfvars
-        echo "storage_account_name = \"${{ secrets.AZURE_STORAGE }}\"" >> backend.tfvars
-        echo "container_name = \"${{ secrets.AZURE_CONTAINER }}\"" >> backend.tfvars
+        echo "storage_account_name = \"${{ secrets.AZURE_STORAGE_ACCOUNT }}\"" >> backend.tfvars
+        echo "container_name = \"${{ secrets.AZURE_STORAGE_CONTAINER }}\"" >> backend.tfvars
         echo "key = \"${{ secrets.AZURE_KEY }}\"" >> backend.tfvars
+        echo "access_key = \"${{ secrets.AZURE_ACCESS_KEY }}\"" >> backend.tfvars
       working-directory: ./Terraform
 
     # Download tfvars from Azure Storage
