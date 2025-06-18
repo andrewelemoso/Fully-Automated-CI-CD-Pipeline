@@ -1,0 +1,51 @@
+name: Docker Build and Push to ACR
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'Docker/**'  # Only trigger when changes are made in Docker folder
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'Docker/**'
+
+env:
+  REGISTRY_NAME: ${{ secrets.ACR_REGISTRY_NAME }}
+  REGISTRY_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+  IMAGE_NAME: your-image-name  # Change this to your desired image name
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+    - name: Log in to Azure Container Registry
+      run: |
+        az acr login --name ${{ env.REGISTRY_NAME }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./Docker
+        file: ./Docker/Dockerfile
+        push: true
+        tags: |
+          ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
