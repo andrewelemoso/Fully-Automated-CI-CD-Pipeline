@@ -1,7 +1,6 @@
 # This workflow installs the latest version of Terraform CLI and authenticates to Azure using a Service Principal.
 # It securely provides backend configuration for the Azure storage backend using GitHub secrets.
-# On pull request events, this workflow will run `terraform init`, `terraform fmt`, and `terraform plan`.
-# On push events to the "main" branch, `terraform apply` will be executed.
+# Manual triggers are available for both apply and destroy operations.
 #
 # Documentation for `hashicorp/setup-terraform` is located here: https://github.com/hashicorp/setup-terraform
 # Documentation for `azure/login` is here: https://github.com/Azure/login
@@ -23,8 +22,35 @@
 name: 'Terraform'
 
 on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform Action to Execute'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+      environment:
+        description: 'Environment to target'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
   push:
     branches: [ "main" ]
+    paths:
+      - 'Terraform/**'
+      - '.github/workflows/terraform.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'Terraform/**'
 
 permissions:
   contents: read
@@ -34,10 +60,8 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-    environment: production
-    defaults:
-      run:
-        shell: bash
+    environment: ${{ github.event.inputs.environment || 'development' }}
+    
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -95,10 +119,16 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan -input=false
+      run: |
+        if [[ "${{ github.event.inputs.action }}" == "destroy" ]]; then
+          terraform plan -destroy -out=tfplan
+        else
+          terraform plan -out=tfplan
+        fi
       working-directory: ./Terraform
 
-    # On push to "main", build or change infrastructure according to Terraform configuration files
+    # Apply Terraform changes (only on manual trigger with 'apply' or 'destroy' action)
     - name: Terraform Apply
-      run: terraform apply -auto-approve -input=false
+      if: github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy')
+      run: terraform apply -auto-approve tfplan
       working-directory: ./Terraform
